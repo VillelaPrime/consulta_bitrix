@@ -1,0 +1,218 @@
+/* Estilo Geral */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: #f5f5f5;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    color: #333;
+}
+
+.container {
+    background: #ffffff;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 100%;
+    max-width: 900px;
+    animation: fadeIn 1s ease-in-out;
+}
+
+h1 {
+    color: #2c3e50;
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.cnpj-form {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    justify-content: center;
+    align-items: center;
+}
+.cnpj-form label {
+    display: none; /* Esconde o label para economizar espaço */
+}
+
+.cnpj-form input {
+    flex: 1;
+    max-width: 300px;
+    padding: 10px;
+    border: 1px solid #dfe4ea;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.cnpj-form input:focus {
+    border-color: #007aff;
+    box-shadow: 0 0 6px rgba(0, 122, 255, 0.4);
+    outline: none;
+}
+
+.cnpj-form button {
+    background-color: #007aff;
+    color: #ffffff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+}
+
+.cnpj-form button:hover {
+    background-color: #005bb5;
+}
+
+.loading {
+    margin-top: 1rem;
+    font-size: 1.2rem;
+    color: #007aff;
+    animation: blink 1s linear infinite;
+}
+
+/* Estilo do Kanban */
+.kanban-board {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    overflow-x: auto;
+    padding: 0.5rem 0;
+}
+
+.kanban-column {
+    background: #f9f9f9;
+    padding: 1rem;
+    border: 1px solid #e5e5e5;
+    border-radius: 12px;
+    min-width: 220px;
+    max-width: 250px;
+    flex: 1;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+.kanban-column h2 {
+    text-align: center;
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    color: #444;
+}
+
+.kanban-item {
+    background: #ffffff;
+    padding: 10px 15px;
+    margin-bottom: 10px;
+    border: 1px solid #dfe4ea;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.kanban-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.kanban-item:last-child {
+    margin-bottom: 0;
+}
+
+/* Scrollbar personalizada */
+.kanban-board::-webkit-scrollbar {
+    height: 8px;
+}
+
+.kanban-board::-webkit-scrollbar-thumb {
+    background: #d1d1d6;
+    border-radius: 4px;
+}
+
+.kanban-board::-webkit-scrollbar-thumb:hover {
+    background: #a8a8aa;
+}
+
+.kanban-board::-webkit-scrollbar-track {
+    background: #f5f5f5;
+    border-radius: 4px;
+}
+
+.contact-list {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #f7f9fc;
+    border: 1px solid #dfe4ea;
+    border-radius: 8px;
+}
+
+.contact-item {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 8px;
+}
+
+.contact-item:last-child {
+    margin-bottom: 0;
+}
+
+.contact-name {
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+.contact-phone {
+    font-size: 0.9rem;
+    color: #555;
+    margin-top: 4px;
+}
+
+
+/* Animações */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes blink {
+    0% { opacity: 1; }
+    50% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+/* Estilos para Status */
+/* Estilo do status-display */
+.status-display {
+    margin-top: 20px;
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+/* Estilos para os status */
+.status-liberado {
+    background-color: #dfffd6;
+    color: #2e7d32;
+    border: 2px solid #4caf50;
+}
+
+.status-nao-liberado {
+    background-color: #ffd6d6;
+    color: #c62828;
+    border: 2px solid #f44336;
+}
+
+
+/* Animação de FadeIn */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+

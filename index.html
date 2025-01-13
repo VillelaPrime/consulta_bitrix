@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <title>Consulta de CNPJ</title>
+    <link rel="stylesheet" href="../static/css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Consulta Bitrix</h1>
+        <form id="cnpj-form" class="cnpj-form">
+            <label for="cnpj">Digite o CNPJ:</label>
+            <input type="text" id="cnpj" name="cnpj" required>
+            <button type="submit">Consultar</button>
+        </form>
+        <div id="loading" class="loading" style="display: none;">Consultando...</div>
+        
+        <!-- Adicionando o status-display -->
+        <div id="status-display" class="status-display"></div>
+        
+        <div id="kanban-board" class="kanban-board" style="display: none;"></div>
+    </div>
+    <script src="../static/js/scripts.js"></script>
+</body>
+
+</html>
