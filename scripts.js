@@ -241,6 +241,7 @@ function formatCNPJ(value) {
 }
 
 function showError(message) {
+    const statusDisplay = document.getElementById('status-display')
     statusDisplay.innerHTML = `<div class="status-card status-nao-liberado">${message}</div>`;
     container.classList.add('theme-red');
 }
