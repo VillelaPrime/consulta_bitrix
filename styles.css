@@ -36,6 +36,7 @@ h1 {
     justify-content: center;
     align-items: center;
 }
+
 .cnpj-form label {
     display: none; /* Esconde o label para economizar espaço */
 }
@@ -172,6 +173,22 @@ h1 {
     margin-top: 4px;
 }
 
+/* Estilo do botão de outros funis */
+.show-others-button {
+    background-color: #ffa500;
+    color: #ffffff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    margin-top: 1rem;
+    transition: background-color 0.3s ease;
+}
+
+.show-others-button:hover {
+    background-color: #cc8400;
+}
 
 /* Animações */
 @keyframes fadeIn {
@@ -186,7 +203,6 @@ h1 {
 }
 
 /* Estilos para Status */
-/* Estilo do status-display */
 .status-display {
     margin-top: 20px;
     padding: 15px;
@@ -194,9 +210,9 @@ h1 {
     text-align: center;
     font-size: 1.5rem;
     font-weight: bold;
+    transition: all 0.3s ease;
 }
 
-/* Estilos para os status */
 .status-liberado {
     background-color: #dfffd6;
     color: #2e7d32;
@@ -209,10 +225,17 @@ h1 {
     border: 2px solid #f44336;
 }
 
-
-/* Animação de FadeIn */
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+.status-error {
+    background-color: #ffe6e6;
+    color: #b71c1c;
+    border: 2px solid #f44336;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 20px;
+    animation: fadeIn 0.5s ease-in-out;
+}
+.cnpj-form input.error {
+    border-color: #f44336;
+    box-shadow: 0 0 6px rgba(244, 67, 54, 0.4);
 }
 

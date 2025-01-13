@@ -19,13 +19,23 @@ document.addEventListener('DOMContentLoaded', function () {
 
     form.addEventListener('submit', async function (event) {
         event.preventDefault();
-        const cnpj = document.getElementById('cnpj').value.trim();
+        const input = document.getElementById('cnpj');
+        const rawValue = input.value.trim().replace(/\D/g, ''); // Remove todos os caracteres não numéricos
 
-        if (!cnpj) {
-            alert('Por favor, insira um CNPJ válido.');
+        if (!rawValue) {
+            showError('Por favor, insira um CPF ou CNPJ válido.');
             return;
         }
 
+        if (rawValue.length === 11) {
+            input.value = formatCPF(rawValue);
+        } else if (rawValue.length === 14) {
+            input.value = formatCNPJ(rawValue);
+        } else {
+            showError('O número informado não é um CPF ou CNPJ válido.');
+            return;
+        }
+        const cnpj = input.value.trim();
         loading.style.display = 'block';
         kanbanBoard.style.display = 'none';
         statusDisplay.innerHTML = '';
@@ -88,13 +98,21 @@ document.addEventListener('DOMContentLoaded', function () {
             kanbanBoard.innerHTML = '';
 
             let canProceed = true;
+            
+            const operationalAndFinancial = deals.filter(deal => 
+                categoryMap[deal.CATEGORY_ID]?.toLowerCase() === 'operacional' || categoryMap[deal.CATEGORY_ID]?.toLowerCase() === 'plano de saude financeira'
+            );
+
+            const otherFunnels = deals.filter(deal => 
+                categoryMap[deal.CATEGORY_ID]?.toLowerCase() !== 'operacional' && categoryMap[deal.CATEGORY_ID]?.toLowerCase() !== 'plano de saude financeira'
+            );
 
             if (deals.length === 0) {
                 // Caso nenhum negócio seja encontrado
                 container.classList.add('theme-green');
                 statusDisplay.innerHTML = `<div class="status-card status-liberado"><h2>PROSSEGUIR</h2><p>Não existe nenhum negócio associado a este CNPJ. Você pode prosseguir com o atendimento.</p></div>`;
             } else {
-                const groupedResults = deals.reduce((acc, deal) => {
+                const groupedResults = operationalAndFinancial.reduce((acc, deal) => {
                     const funilName = categoryMap[deal.CATEGORY_ID] || 'Funil Desconhecido';
                     if (!acc[funilName]) {
                         acc[funilName] = [];
@@ -160,6 +178,49 @@ document.addEventListener('DOMContentLoaded', function () {
                     container.classList.add('theme-red');
                     statusDisplay.innerHTML = `<div class="status-card status-nao-liberado"><h2>NÃO PROSSEGUIR</h2></div>`;
                 }
+
+                if (otherFunnels.length > 0) {
+                    const showOthersButton = document.createElement('button');
+                    showOthersButton.textContent = 'Exibir outros funis';
+                    showOthersButton.className = 'show-others-button';
+                    showOthersButton.addEventListener('click', () => {
+                        const groupedOthers = otherFunnels.reduce((acc, deal) => {
+                            const funilName = categoryMap[deal.CATEGORY_ID] || 'Funil Desconhecido';
+                            if (!acc[funilName]) {
+                                acc[funilName] = [];
+                            }
+                            acc[funilName].push(deal);
+                            return acc;
+                        }, {});
+
+                        Object.keys(groupedOthers).forEach(funil => {
+                            const column = document.createElement('div');
+                            column.className = 'kanban-column';
+
+                            const columnHeader = document.createElement('h2');
+                            columnHeader.textContent = funil;
+                            column.appendChild(columnHeader);
+
+                            groupedOthers[funil].forEach(deal => {
+                                const kanbanItem = document.createElement('div');
+                                kanbanItem.className = 'kanban-item';
+                                kanbanItem.innerHTML = `
+                                    <p><strong>Nome da Empresa:</strong> ${deal.TITLE}</p>
+                                    <p><strong>CNPJ:</strong> ${cnpj}</p>
+                                    <p><strong>Etapa:</strong> ${stageMap[deal.STAGE_ID] || 'Etapa Desconhecida'}</p>
+                                    <p><strong>Funil:</strong> ${funil}</p>
+                                `;
+                                column.appendChild(kanbanItem);
+                            });
+
+                            kanbanBoard.appendChild(column);
+                        });
+
+                        showOthersButton.style.display = 'none';
+                    });
+
+                    kanbanBoard.appendChild(showOthersButton);
+                }
             }
 
             kanbanBoard.style.display = 'flex';
@@ -171,3 +232,15 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 });
+function formatCPF(value) {
+    return value.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+}
+
+function formatCNPJ(value) {
+    return value.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5');
+}
+
+function showError(message) {
+    statusDisplay.innerHTML = `<div class="status-card status-nao-liberado">${message}</div>`;
+    container.classList.add('theme-red');
+}
