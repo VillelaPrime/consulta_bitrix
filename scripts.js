@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', function () {
         container.classList.remove('theme-green', 'theme-red');
 
         try {
-            const apiBase = 'https://villela.bitrix24.com.br/rest/16640/1e2stuw2jzpxgf1g';
+            const apiBase = 'https://villela.bitrix24.com.br/rest/16640/0jcbup8p75s3drmo';
             const dealListUrl = `${apiBase}/crm.deal.list.json`;
             const contactGetUrl = `${apiBase}/crm.contact.get`;
             const categoryListUrl = `${apiBase}/crm.dealcategory.list.json`;
