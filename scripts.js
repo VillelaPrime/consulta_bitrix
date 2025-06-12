@@ -183,7 +183,7 @@ document.addEventListener('DOMContentLoaded', function () {
             // Lógica para decidir se PROSSEGUIR ou NÃO PROSSEGUIR considerando conflitos
             if (statusByFunnel.length > 0) {
                 // Busca o negócio mais antigo dos funis relevantes
-                statusByFunnel.sort((a, b) => new Date(a.dateCreate) - new Date(b.dateCreate));
+                statusByFunnel.sort((a, b) => new Date(b.dateCreate) - new Date(a.dateCreate));
                 // O status do mais antigo decide
                 const prevalente = statusByFunnel[0].status;
                 if (prevalente === 'Liberado') {
@@ -264,7 +264,9 @@ function showError(message) {
 }
 
 function formatDate(dateString) {
-    // Recebe "2025-03-12T19:48:25+03:00" e retorna "2025-03-12"
     if (!dateString) return '';
-    return dateString.split('T')[0];
+    // extrai a parte da data antes do 'T'
+    const [datePart] = dateString.split('T');          // "2025-03-12"
+    const [year, month, day] = datePart.split('-');     // ["2025","03","12"]
+    return `${day.padStart(2,'0')}/${month.padStart(2,'0')}/${year}`; // "12/03/2025"
 }
