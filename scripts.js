@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }, {});
 
             // Obter Negócios
-            const dealResponse = await fetch(dealListUrl + `?FILTER[UF_CRM_5C474435A75C9]=${cnpj}&SELECT[]=TITLE&SELECT[]=CATEGORY_ID&SELECT[]=STAGE_ID&SELECT[]=CONTACT_ID`);
+            const dealResponse = await fetch(dealListUrl + `?FILTER[UF_CRM_5C474435A75C9]=${cnpj}&SELECT[]=TITLE&SELECT[]=CATEGORY_ID&SELECT[]=STAGE_ID&SELECT[]=CONTACT_ID&SELECT[]=DATE_CREATE`);
             const dealsData = await dealResponse.json();
             const deals = dealsData.result || [];
 
@@ -97,7 +97,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
             kanbanBoard.innerHTML = '';
 
-            let canProceed = true;
             
             const operationalAndFinancial = deals.filter(deal => 
                 categoryMap[deal.CATEGORY_ID]?.toLowerCase() === 'operacional' || categoryMap[deal.CATEGORY_ID]?.toLowerCase() === 'plano de saude financeira'
@@ -121,63 +120,81 @@ document.addEventListener('DOMContentLoaded', function () {
                     return acc;
                 }, {});
 
-                Object.keys(groupedResults).forEach(funil => {
-                    const column = document.createElement('div');
-                    column.className = 'kanban-column';
+            let statusByFunnel = []; // Guardará objetos do tipo { funil, status, dateCreate }
 
-                    const columnHeader = document.createElement('h2');
-                    columnHeader.textContent = funil;
-                    column.appendChild(columnHeader);
 
-                    groupedResults[funil].forEach(deal => {
-                        let status = 'Liberado';
-                        let statusClass = 'status-liberado';
-                        let categoriaAtual = categoryMap[deal.CATEGORY_ID] ? categoryMap[deal.CATEGORY_ID]: 'Funil Desconhecido'
+            Object.keys(groupedResults).forEach(funil => {
+                const column = document.createElement('div');
+                column.className = 'kanban-column';
 
-                        if (categoriaAtual.toLowerCase() === 'operacional') {
-                            if (!operationalStagesLiberated.includes(stageMap[deal.STAGE_ID])) {
-                                status = 'Não Liberado';
-                                statusClass = 'status-nao-liberado';
-                                canProceed = false;
-                            }
-                        } else if (categoriaAtual.toLowerCase() === 'plano de saude financeira') {
-                            if (!financialStagesLiberated.includes(stageMap[deal.STAGE_ID])) {
-                                status = 'Não Liberado';
-                                statusClass = 'status-nao-liberado';
-                                canProceed = false;
-                            }
+                const columnHeader = document.createElement('h2');
+                columnHeader.textContent = funil;
+                column.appendChild(columnHeader);
+
+                groupedResults[funil].forEach(deal => {
+                    let status = 'Liberado';
+                    let statusClass = 'status-liberado';
+                    let categoriaAtual = categoryMap[deal.CATEGORY_ID] || 'Funil Desconhecido';
+
+                    if (categoriaAtual.toLowerCase() === 'operacional') {
+                        if (!operationalStagesLiberated.includes(stageMap[deal.STAGE_ID])) {
+                            status = 'Não Liberado';
+                            statusClass = 'status-nao-liberado';
                         }
+                    } else if (categoriaAtual.toLowerCase() === 'plano de saude financeira') {
+                        if (!financialStagesLiberated.includes(stageMap[deal.STAGE_ID])) {
+                            status = 'Não Liberado';
+                            statusClass = 'status-nao-liberado';
+                        }
+                    }
 
-                        const kanbanItem = document.createElement('div');
-                        kanbanItem.className = `kanban-item ${statusClass}`;
-                        kanbanItem.innerHTML = `
-                            <p><strong>Nome da Empresa:</strong> ${deal.TITLE}</p>
-                            <p><strong>CNPJ:</strong> ${cnpj}</p>
-                            <p><strong>Etapa:</strong> ${stageMap[deal.STAGE_ID] || 'Etapa Desconhecida'}</p>
-                            <p><strong>Funil:</strong> ${funil}</p>
-                            <div class="contact-list">
-                                <p><strong>Contatos:</strong></p>
-                                ${deal.CONTACT_ID ? Object.values(contacts).map(contact => `
-                                    <div class="contact-item">
-                                        <span class="contact-name">${contact.name}</span>
-                                        <span class="contact-phone">${contact.phone}</span>
-                                    </div>
-                                `).join('') : '<p>Sem contatos associados.</p>'}
-                            </div>
-                        `;
-                        column.appendChild(kanbanItem);
+                    // Adiciona ao array para análise posterior de conflito
+                    statusByFunnel.push({
+                        funil: funil,
+                        status: status,
+                        dateCreate: deal.DATE_CREATE,
                     });
 
-                    kanbanBoard.appendChild(column);
+                    // Inclui data no card do negócio
+                    const kanbanItem = document.createElement('div');
+                    kanbanItem.className = `kanban-item ${statusClass}`;
+                    kanbanItem.innerHTML = `
+                        <p><strong>Nome da Empresa:</strong> ${deal.TITLE}</p>
+                        <p><strong>CNPJ:</strong> ${cnpj}</p>
+                        <p><strong>Etapa:</strong> ${stageMap[deal.STAGE_ID] || 'Etapa Desconhecida'}</p>
+                        <p><strong>Funil:</strong> ${funil}</p>
+                        <p><strong>Data de Criação:</strong> ${formatDate(deal.DATE_CREATE)}</p>
+                        <div class="contact-list">
+                            <p><strong>Contatos:</strong></p>
+                            ${deal.CONTACT_ID ? Object.values(contacts).map(contact => `
+                                <div class="contact-item">
+                                    <span class="contact-name">${contact.name}</span>
+                                    <span class="contact-phone">${contact.phone}</span>
+                                </div>
+                            `).join('') : '<p>Sem contatos associados.</p>'}
+                        </div>
+                    `;
+                    column.appendChild(kanbanItem);
                 });
 
-                if (canProceed) {
+                kanbanBoard.appendChild(column);
+            });
+
+            // Lógica para decidir se PROSSEGUIR ou NÃO PROSSEGUIR considerando conflitos
+            if (statusByFunnel.length > 0) {
+                // Busca o negócio mais antigo dos funis relevantes
+                statusByFunnel.sort((a, b) => new Date(a.dateCreate) - new Date(b.dateCreate));
+                // O status do mais antigo decide
+                const prevalente = statusByFunnel[0].status;
+                if (prevalente === 'Liberado') {
                     container.classList.add('theme-green');
                     statusDisplay.innerHTML = `<div class="status-card status-liberado"><h2>PROSSEGUIR</h2></div>`;
                 } else {
                     container.classList.add('theme-red');
                     statusDisplay.innerHTML = `<div class="status-card status-nao-liberado"><h2>NÃO PROSSEGUIR</h2></div>`;
                 }
+            }
+
 
                 if (otherFunnels.length > 0) {
                     const showOthersButton = document.createElement('button');
@@ -244,4 +261,10 @@ function showError(message) {
     const statusDisplay = document.getElementById('status-display')
     statusDisplay.innerHTML = `<div class="status-card status-nao-liberado">${message}</div>`;
     container.classList.add('theme-red');
+}
+
+function formatDate(dateString) {
+    // Recebe "2025-03-12T19:48:25+03:00" e retorna "2025-03-12"
+    if (!dateString) return '';
+    return dateString.split('T')[0];
 }
