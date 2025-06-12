@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Etapas liberadas dos funis
     const operationalStagesLiberated = [
-        "Pre Renuncia", "Aguardando Renúncia/Distrato", "Ex PJ", "Ex Sem interesse", 
+        "Pre-Renuncia","Pre Renuncia", "Aguardando Renúncia/Distrato", "Ex PJ", "Ex Sem interesse", 
         "Ex Pre Renuncia", "Ex PJ/PAP", "Ex Distratado"
     ];
 
